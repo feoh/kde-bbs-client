@@ -6,7 +6,19 @@
 
 ## Recent Updates
 
-### ANSI Color Support (Latest)
+### Font Size Control (Latest)
+- **Feature**: Adjustable terminal font size with keyboard shortcuts
+- **Keyboard Shortcuts**:
+  - `Ctrl+Plus` or `Ctrl+=` - Increase font size
+  - `Ctrl+Minus` - Decrease font size
+  - `Ctrl+0` - Reset to default (10pt)
+- **Configuration**:
+  - Font size saved globally in config file
+  - Range: 6pt to 48pt
+  - Increments of 2pt per keystroke
+- **Feedback**: Status bar shows current font size when changed
+
+### ANSI Color Support
 - **Feature**: Full ANSI color and formatting support
 - **Implementation**: Custom ANSI escape sequence parser (`ansi_parser.py`)
 - **Capabilities**:
@@ -20,7 +32,7 @@
 ### Bug Fixes
 - **Text visibility**: Fixed invisible text in configuration dialog and BBS chooser list
 - **Input mode**: Changed from line-oriented to character-by-character telnet input for proper BBS interaction
-- **Backspace key**: Changed backspace to send DEL (0x7F) instead of BS (0x08) for proper compatibility with Unix/BBS systems
+- **Backspace handling**: Fixed backspace display by properly handling BS (0x08) and DEL (0x7F) control characters from server - now deletes previous character instead of showing empty squares. Based on analysis of iscabbs-client C codebase.
 
 ### Python 3.13+ Compatibility Fix
 - **Issue**: `ModuleNotFoundError: No module named 'telnetlib'`

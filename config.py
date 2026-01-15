@@ -10,6 +10,11 @@ import yaml
 class ConfigManager:
     """Manages configuration file reading and writing."""
 
+    # Default font size for terminal display
+    DEFAULT_FONT_SIZE = 10
+    MIN_FONT_SIZE = 6
+    MAX_FONT_SIZE = 48
+
     def __init__(self):
         """Initialize the configuration manager."""
         self.config_dir = Path.home() / '.config' / 'kdebbsclient'
@@ -98,3 +103,30 @@ class ConfigManager:
         """Get list of configured BBS systems."""
         config = self.load_config()
         return config.get('bbs_systems', [])
+
+    def get_font_size(self) -> int:
+        """Get the global font size setting."""
+        config = self.load_config()
+        size = config.get('font_size', self.DEFAULT_FONT_SIZE)
+        # Ensure size is within bounds
+        return max(self.MIN_FONT_SIZE, min(self.MAX_FONT_SIZE, size))
+
+    def set_font_size(self, size: int) -> None:
+        """Set the global font size setting."""
+        # Clamp to valid range
+        size = max(self.MIN_FONT_SIZE, min(self.MAX_FONT_SIZE, size))
+
+        # Load existing config and update font_size
+        config = self.load_config()
+        config['font_size'] = size
+
+        # Ensure config directory exists
+        self.config_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write to file
+        try:
+            with open(self.config_file, 'w') as f:
+                yaml.safe_dump(config, f, default_flow_style=False, sort_keys=False)
+        except Exception as e:
+            print(f"Error saving font size: {e}")
+            raise

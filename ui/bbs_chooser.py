@@ -5,6 +5,7 @@ BBS Chooser window for selecting which BBS to connect to.
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
+    QApplication,
     QHBoxLayout,
     QLabel,
     QListWidget,
@@ -61,6 +62,11 @@ class BBSChooser(QMainWindow):
 
         # Buttons
         button_layout = QHBoxLayout()
+
+        self.quit_button = QPushButton("Quit")
+        self.quit_button.clicked.connect(self.quit_application)
+        button_layout.addWidget(self.quit_button)
+
         button_layout.addStretch()
 
         self.add_button = QPushButton("Add New BBS")
@@ -130,8 +136,15 @@ class BBSChooser(QMainWindow):
             QPushButton#add_button:hover {
                 background-color: #6cc86c;
             }
+            QPushButton#quit_button {
+                background-color: #d9534f;
+            }
+            QPushButton#quit_button:hover {
+                background-color: #e5635f;
+            }
         """)
         self.add_button.setObjectName("add_button")
+        self.quit_button.setObjectName("quit_button")
 
     def load_bbs_list(self):
         """Load the list of BBS systems from configuration."""
@@ -183,9 +196,17 @@ class BBSChooser(QMainWindow):
             return
 
         # Create and show terminal window
-        self.terminal_window = TerminalWindow(bbs_data)
+        self.terminal_window = TerminalWindow(bbs_data, self.config_manager)
         self.terminal_window.show()
         self.terminal_window.connect_to_bbs()
+
+    def quit_application(self):
+        """Quit the application, closing all windows cleanly."""
+        # Close terminal window if it exists
+        if self.terminal_window:
+            self.terminal_window.close()
+        # Quit the application
+        QApplication.quit()
 
     def closeEvent(self, event):
         """Handle window close event."""
