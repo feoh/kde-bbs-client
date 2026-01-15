@@ -5,6 +5,7 @@ Terminal window for displaying BBS output and handling user input.
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
 from PyQt6.QtWidgets import (
+    QApplication,
     QMainWindow,
     QMessageBox,
     QStatusBar,
@@ -284,6 +285,9 @@ class TerminalWindow(QMainWindow):
             # Check for font size shortcuts first (work regardless of connection)
             if self._handle_font_size_shortcut(event):
                 return True
+            # Check for clipboard shortcuts (work regardless of connection)
+            if self._handle_clipboard_shortcut(event):
+                return True
             # Then handle BBS input if connected
             if self.telnet_client and self.telnet_client.running:
                 return self.handle_key_press(event)
@@ -356,6 +360,65 @@ class TerminalWindow(QMainWindow):
 
         # Show feedback in status bar
         self.status_bar.showMessage(f"Font size: {size}pt", 2000)
+
+    def _handle_clipboard_shortcut(self, event):
+        """Handle clipboard keyboard shortcuts. Returns True if handled."""
+        modifiers = event.modifiers()
+        key = event.key()
+
+        # Check for Ctrl modifier
+        if modifiers & Qt.KeyboardModifier.ControlModifier:
+            # Ctrl+Shift+C or Ctrl+C for copy
+            if key == Qt.Key.Key_C:
+                self.copy_to_clipboard()
+                return True
+            # Ctrl+Shift+V or Ctrl+V for paste
+            elif key == Qt.Key.Key_V:
+                self.paste_from_clipboard()
+                return True
+            # Ctrl+X for cut (behaves like copy in terminal)
+            elif key == Qt.Key.Key_X:
+                self.copy_to_clipboard()
+                return True
+
+        return False
+
+    def copy_to_clipboard(self):
+        """Copy selected text to clipboard."""
+        cursor = self.terminal_display.textCursor()
+        selected_text = cursor.selectedText()
+
+        if selected_text:
+            # QTextEdit uses Unicode paragraph separator (U+2029) for line breaks
+            # Convert them to regular newlines
+            selected_text = selected_text.replace('\u2029', '\n')
+
+            clipboard = QApplication.clipboard()
+            clipboard.setText(selected_text)
+            self.status_bar.showMessage("Copied to clipboard", 2000)
+        else:
+            self.status_bar.showMessage("No text selected", 2000)
+
+    def paste_from_clipboard(self):
+        """Paste clipboard contents to the BBS."""
+        if not self.telnet_client or not self.telnet_client.running:
+            self.status_bar.showMessage("Not connected - cannot paste", 2000)
+            return
+
+        clipboard = QApplication.clipboard()
+        text = clipboard.text()
+
+        if text:
+            # Convert newlines to carriage returns for BBS compatibility
+            text = text.replace('\r\n', '\r').replace('\n', '\r')
+
+            # Send each character to the BBS
+            for char in text:
+                self.telnet_client.send_data(char)
+
+            self.status_bar.showMessage(f"Pasted {len(text)} characters", 2000)
+        else:
+            self.status_bar.showMessage("Clipboard is empty", 2000)
 
     def handle_key_press(self, event):
         """Handle key press events and send to BBS."""
