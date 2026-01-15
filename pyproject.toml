@@ -1,6 +1,6 @@
 [project]
 name = "kde-bbs-client"
-version = "0.1.1"
+version = "0.1.2"
 description = "A modern KDE client for old school telnet based BBS systems"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,7 +22,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["kdebbsclient.py", "config.py", "telnet_client.py", "ansi_parser.py", "ui"]
+include = [
+    "*.py",
+    "ui/**/*.py",
+]
 
 [tool.ruff]
 line-length = 100
