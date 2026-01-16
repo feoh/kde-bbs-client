@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QMainWindow,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -66,6 +67,10 @@ class BBSChooser(QMainWindow):
         self.quit_button = QPushButton("Quit")
         self.quit_button.clicked.connect(self.quit_application)
         button_layout.addWidget(self.quit_button)
+
+        self.help_button = QPushButton("Terminal Help")
+        self.help_button.clicked.connect(self.show_terminal_help)
+        button_layout.addWidget(self.help_button)
 
         button_layout.addStretch()
 
@@ -142,9 +147,16 @@ class BBSChooser(QMainWindow):
             QPushButton#quit_button:hover {
                 background-color: #e5635f;
             }
+            QPushButton#help_button {
+                background-color: #5bc0de;
+            }
+            QPushButton#help_button:hover {
+                background-color: #6bd0ee;
+            }
         """)
         self.add_button.setObjectName("add_button")
         self.quit_button.setObjectName("quit_button")
+        self.help_button.setObjectName("help_button")
 
     def load_bbs_list(self):
         """Load the list of BBS systems from configuration."""
@@ -207,6 +219,55 @@ class BBSChooser(QMainWindow):
             self.terminal_window.close()
         # Quit the application
         QApplication.quit()
+
+    def show_terminal_help(self):
+        """Show help dialog with terminal window features."""
+        help_text = """
+<h2>Terminal Window Features</h2>
+
+<h3>Keyboard Shortcuts</h3>
+<table>
+<tr><td><b>Ctrl+Plus</b> or <b>Ctrl+=</b></td><td>Increase font size</td></tr>
+<tr><td><b>Ctrl+Minus</b></td><td>Decrease font size</td></tr>
+<tr><td><b>Ctrl+0</b></td><td>Reset font size to default</td></tr>
+<tr><td><b>Ctrl+C</b></td><td>Copy selected text to clipboard</td></tr>
+<tr><td><b>Ctrl+V</b></td><td>Paste clipboard contents to BBS</td></tr>
+<tr><td><b>Ctrl+X</b></td><td>Cut (copies selection)</td></tr>
+</table>
+
+<h3>Navigation Keys</h3>
+<table>
+<tr><td><b>Arrow Keys</b></td><td>Navigate menus and text</td></tr>
+<tr><td><b>Page Up/Down</b></td><td>Scroll through content</td></tr>
+<tr><td><b>Home/End</b></td><td>Jump to start/end of line</td></tr>
+<tr><td><b>Tab</b></td><td>Send tab character</td></tr>
+<tr><td><b>Escape</b></td><td>Send escape character</td></tr>
+</table>
+
+<h3>Display Features</h3>
+<ul>
+<li><b>ANSI Colors:</b> Full support for 16-color, 256-color, and RGB colors</li>
+<li><b>Blinking Cursor:</b> Green block cursor shows typing position</li>
+<li><b>Resizable Window:</b> Window size is saved between sessions</li>
+<li><b>Font Size:</b> Font size is saved between sessions</li>
+</ul>
+
+<h3>Mouse Features</h3>
+<ul>
+<li><b>Text Selection:</b> Click and drag to select text for copying</li>
+<li><b>Double-click:</b> Select a word</li>
+</ul>
+
+<h3>Configuration</h3>
+<p>Settings are stored in:<br>
+<code>~/.config/kdebbsclient/client-config.yaml</code></p>
+"""
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("Terminal Help")
+        msg_box.setTextFormat(Qt.TextFormat.RichText)
+        msg_box.setText(help_text)
+        msg_box.setIcon(QMessageBox.Icon.Information)
+        msg_box.exec()
 
     def closeEvent(self, event):
         """Handle window close event."""
