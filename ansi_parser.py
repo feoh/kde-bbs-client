@@ -4,7 +4,7 @@ ANSI escape sequence parser for terminal color and formatting support.
 
 import re
 
-from PyQt6.QtGui import QColor, QTextCharFormat
+from PySide6.QtGui import QColor, QTextCharFormat
 
 
 class ANSIParser:

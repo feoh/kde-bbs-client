@@ -5,7 +5,7 @@ KDE BBS Client - A modern KDE client for old school telnet based BBS systems.
 
 import sys
 
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 from config import ConfigManager
 from ui.bbs_chooser import BBSChooser

@@ -4,17 +4,17 @@ Telnet client for BBS connections.
 
 import socket
 
-from PyQt6.QtCore import QThread, pyqtSignal
+from PySide6.QtCore import QThread, Signal
 
 
 class TelnetClient(QThread):
     """Telnet client that runs in a separate thread."""
 
     # Signals
-    data_received = pyqtSignal(bytes)
-    connection_established = pyqtSignal()
-    connection_error = pyqtSignal(str)
-    connection_closed = pyqtSignal()
+    data_received = Signal(bytes)
+    connection_established = Signal()
+    connection_error = Signal(str)
+    connection_closed = Signal()
 
     # Telnet protocol commands
     IAC = bytes([255])  # Interpret As Command

@@ -2,9 +2,9 @@
 Terminal window for displaying BBS output and handling user input.
 """
 
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
+from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QMessageBox,
@@ -140,6 +140,18 @@ class TerminalWindow(QMainWindow):
         """Handle connection closure."""
         self.status_bar.showMessage("Disconnected")
         self.append_to_display("\nConnection closed.\n")
+
+        # Ask user if they want to close the window
+        reply = QMessageBox.question(
+            self,
+            "Connection Closed",
+            "The BBS connection has been closed. Do you want to close this window?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            self.close()
 
     def handle_data_received(self, data):
         """Handle data received from the BBS."""
