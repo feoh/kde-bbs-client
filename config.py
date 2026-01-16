@@ -15,6 +15,12 @@ class ConfigManager:
     MIN_FONT_SIZE = 6
     MAX_FONT_SIZE = 48
 
+    # Default window size
+    DEFAULT_WINDOW_WIDTH = 1280
+    DEFAULT_WINDOW_HEIGHT = 1024
+    MIN_WINDOW_SIZE = 400
+    MAX_WINDOW_SIZE = 4096
+
     def __init__(self):
         """Initialize the configuration manager."""
         self.config_dir = Path.home() / '.config' / 'kdebbsclient'
@@ -129,4 +135,36 @@ class ConfigManager:
                 yaml.safe_dump(config, f, default_flow_style=False, sort_keys=False)
         except Exception as e:
             print(f"Error saving font size: {e}")
+            raise
+
+    def get_window_size(self) -> tuple[int, int]:
+        """Get the terminal window size setting."""
+        config = self.load_config()
+        width = config.get('window_width', self.DEFAULT_WINDOW_WIDTH)
+        height = config.get('window_height', self.DEFAULT_WINDOW_HEIGHT)
+        # Ensure size is within bounds
+        width = max(self.MIN_WINDOW_SIZE, min(self.MAX_WINDOW_SIZE, width))
+        height = max(self.MIN_WINDOW_SIZE, min(self.MAX_WINDOW_SIZE, height))
+        return (width, height)
+
+    def set_window_size(self, width: int, height: int) -> None:
+        """Set the terminal window size setting."""
+        # Clamp to valid range
+        width = max(self.MIN_WINDOW_SIZE, min(self.MAX_WINDOW_SIZE, width))
+        height = max(self.MIN_WINDOW_SIZE, min(self.MAX_WINDOW_SIZE, height))
+
+        # Load existing config and update window size
+        config = self.load_config()
+        config['window_width'] = width
+        config['window_height'] = height
+
+        # Ensure config directory exists
+        self.config_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write to file
+        try:
+            with open(self.config_file, 'w') as f:
+                yaml.safe_dump(config, f, default_flow_style=False, sort_keys=False)
+        except Exception as e:
+            print(f"Error saving window size: {e}")
             raise

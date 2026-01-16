@@ -35,12 +35,19 @@ class TerminalWindow(QMainWindow):
         else:
             self.font_size = 10  # Default fallback
 
+        # Load window size from config or use default
+        if self.config_manager:
+            self.window_width, self.window_height = self.config_manager.get_window_size()
+        else:
+            self.window_width, self.window_height = 1024, 768  # Default fallback
+
         # Cursor state
         self.cursor_visible = True
         self.cursor_char = '\u2588'  # Full block character (█)
 
         self.setWindowTitle(f"KDE BBS Client - {bbs_data.get('name', 'BBS')}")
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(400, 300)
+        self.resize(self.window_width, self.window_height)
 
         self.setup_ui()
 
@@ -485,6 +492,14 @@ class TerminalWindow(QMainWindow):
             return True
 
         return False
+
+    def resizeEvent(self, event):
+        """Handle window resize event and save new size."""
+        super().resizeEvent(event)
+        # Save the new window size to config
+        if self.config_manager:
+            new_size = event.size()
+            self.config_manager.set_window_size(new_size.width(), new_size.height())
 
     def closeEvent(self, event):
         """Handle window close event."""
